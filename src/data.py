@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import datetime
 
 import pandas as pd
@@ -5,6 +6,47 @@ import pandas as pd
 from src.timer import Timer
 
 _PBP_URL = "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_{year}.parquet"
+
+
+@dataclass
+class TeamStats:
+    """Per-team aggregated stats for a window of games."""
+
+    # Offensive efficiency
+    off_rush_epa: float
+    off_pass_epa: float
+
+    # Defensive efficiency
+    def_rush_epa: float
+    def_pass_epa: float
+
+    # First down rate
+    off_fdr: float
+    def_fdr: float
+
+    # Turnovers
+    to_differential: float
+
+    # Explosive plays (10+ yard runs, 20+ yard passes)
+    off_exp_rate: float
+    def_exp_rate: float
+
+    # Line metrics (sacks + QB hits + pressures + hurries, per game)
+    ol_metric: float
+    dl_metric: float
+
+    # Penalties per game
+    penalties: float
+    penalty_yards: float
+
+
+@dataclass
+class Matchup:
+    """A game between two teams."""
+
+    away: TeamStats
+    home: TeamStats
+    div: bool
 
 
 def load_raw_pbp_data() -> tuple[pd.DataFrame, pd.DataFrame]:
