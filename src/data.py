@@ -5,7 +5,7 @@ from rpy2.robjects import pandas2ri
 from rpy2.robjects.conversion import localconverter
 
 
-def load_training_pbp_data() -> tuple[pd.DataFrame, pd.DataFrame]:
+def load_raw_pbp_data() -> tuple[pd.DataFrame, pd.DataFrame]:
     """Load play-by-play data from nflfastR.
 
     Returns a tuple of (training_data, testing_data) where:
@@ -13,7 +13,7 @@ def load_training_pbp_data() -> tuple[pd.DataFrame, pd.DataFrame]:
     - testing_data: the current year's season
     """
 
-    print("Loading training data, this will take a while...")
+    print("Loading pbp data, this will take a while...")
     
     current_year = datetime.now().year
     ro.r("library(nflfastR)")
