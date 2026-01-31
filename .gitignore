@@ -7,3 +7,4 @@ venv/
 .config
 *.staley
 test.*
+__pycache__/
