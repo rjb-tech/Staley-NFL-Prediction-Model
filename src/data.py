@@ -31,9 +31,29 @@ class TeamStats:
     off_exp_rate: float
     def_exp_rate: float
 
-    # Line metrics (sacks + QB hits + pressures + hurries, per game)
-    ol_metric: float
-    dl_metric: float
+    # Third-down conversion rate
+    off_third_down_pct: float
+    def_third_down_pct: float
+
+    # Red zone efficiency (EPA inside the 20)
+    off_rz_epa: float
+    def_rz_epa: float
+
+    # Win probability added (per play)
+    off_wpa: float
+    def_wpa: float
+
+    # Passing detail
+    off_completion_pct: float
+    def_completion_pct: float
+    off_air_yards: float
+    def_air_yards: float
+    off_yac: float
+    def_yac: float
+
+    # Pressure rate (pressures / dropbacks)
+    off_pressure_rate: float
+    def_pressure_rate: float
 
     # Penalties per game
     penalties: float
