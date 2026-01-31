@@ -7,3 +7,4 @@ black
 pycodestyle
 matplotlib
 python-dotenv
+rpy2
