@@ -8,3 +8,4 @@ venv/
 *.staley
 test.*
 __pycache__/
+data/
