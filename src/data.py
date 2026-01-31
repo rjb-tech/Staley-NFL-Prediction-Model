@@ -6,6 +6,7 @@ import pandas as pd
 from src.timer import Timer
 
 _PBP_URL = "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_{year}.parquet"
+_TEAMS_URL = "https://github.com/nflverse/nflverse-data/releases/download/teams/teams_colors_logos.parquet"
 
 
 @dataclass
@@ -61,35 +62,62 @@ class TeamStats:
 
 
 @dataclass
+class TeamInfo:
+    abbr: str
+    name: str
+    team_logo_link: str
+    division: str
+    conference: str
+    color_1: str
+    color_2: str
+    color_3: str
+    color_4: str
+
+
+@dataclass
+class Team:
+    info: TeamInfo
+    stats: TeamStats
+
+
+@dataclass
 class Matchup:
     """A game between two teams."""
 
-    away: TeamStats
-    home: TeamStats
+    away: Team
+    home: Team
     div: bool
 
 
-def load_raw_pbp_data() -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Load play-by-play data from nflfastR.
+class DataLoader:
+    teams: pd.DataFrame
+    pbp_data_train: pd.DataFrame
+    pbp_data_test: pd.DataFrame
 
-    Returns a tuple of (training_data, testing_data) where:
-    - training_data: all seasons through last year
-    - testing_data: the current year's season
-    """
+    def __init__(self):
+        self.__load_teams()
+        self.__load_raw_pbp_data()
 
-    current_year = datetime.now().year
+    def __load_raw_pbp_data(self) -> None:
+        """Load play-by-play data from nflfastR."""
 
-    with Timer("PBP loading"):
-        # all seasons of pbp data from 1999 - current_year
-        training_data = pd.concat(
-            [
-                pd.read_parquet(_PBP_URL.format(year=y))
-                for y in range(1999, current_year - 1)
-            ],
-            ignore_index=True,
-        )
+        current_year = datetime.now().year
 
-        # latest season
-        testing_data = pd.read_parquet(_PBP_URL.format(year=current_year - 1))
+        with Timer("PBP loading"):
+            # all seasons of pbp data from 1999 - current_year
+            self.pbp_data_train = pd.concat(
+                [
+                    pd.read_parquet(_PBP_URL.format(year=y))
+                    for y in range(1999, current_year - 1)
+                ],
+                ignore_index=True,
+            )
 
-    return training_data, testing_data
+            # latest season
+            self.pbp_data_test = pd.read_parquet(_PBP_URL.format(year=current_year - 1))
+
+    def __load_teams(self) -> None:
+        """Load team colors, logos, and metadata from nflverse."""
+
+        with Timer("Teams loading"):
+            self.teams = pd.read_parquet(_TEAMS_URL)
