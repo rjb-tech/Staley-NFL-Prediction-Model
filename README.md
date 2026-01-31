@@ -1,33 +1,65 @@
-# Staley - A Neural Network To Predict NFL Games
+# Staley NFL Prediction Model
 
+NFL game prediction using XGBoost regression.
 
-### **Overview**
-Staley is a neural network used to predict NFL games based on datasets containing 29 features (14 for the home and away team, 1 to indicate whether the game is a divisional game) per game. Currently in its second iteration, the network is trained on the last 21 NFL seasons with a training batch size of 16. This batch size was chosen to hopefully optimize prediction accuracy on a by-week basis rather than a by-game basis, as predictions are made a week at a time (average of 15 to 16 games per week). Data is scaled to be zero-centered using the MaxAbs function from the ScikitLearn Preprocessing python module, and this scaling is performed after seperarting the data into batches. This ensures similar data across batches. Training and validation data are shuffled multiple times before each training epoch. I am not a data science researcher or professional, so all of my programming decisions are based on Machine Learning books/research and MIT online lectures from Lex Fridman.
-  
-  
-### **How are predictions made?** 
-5 models are trained on the same data before the season starts. A dataframe is made before each week containing a row for each game that will be played, and the dataframe is passed through each model. The results are compared, and the result that occurs most from the 5 models is considered the prediction. This method may change as I study version 2 a little more. It was implemented in version 1 due to the training batch size being 1; that small of a batch size along with the data not being scaled made it easier for the model to learn useless patterns in the training data.
-  
-  
-### **2020-2021 Season Results** 
-159-96-1 *or* 62.1% regular season prediction accuracy
+## Setup
 
-### **Current training/validation loss and accuracy results** 
+```bash
+make initialize
+```
 
+This installs R, nflfastR, creates a Python venv, and installs pip dependencies.
 
-### **Dependencies** 
-##### *Python Dependencies*
-Matplotlib - used for graphing loss during training. 
-Pytorch - used for creation and training of the network models  
-Beautiful Soup - Used for web scraping and stat gathering  
-Openpyxl - Used for spreadsheet manipulation and record-keeping  
-Scikit Learn - Used for data preprocessing  
-Numpy - Used for data processesing and manipulation  
+To set up manually:
 
-##### *R Dependencies*
-nflfastR - used to gather and synthesize data from the 1999-2020 NFL seasons  
-Tidyverse - used to clean data after being gathered  
-Reticulate - used to interface R dataframes with the Python neural network  
-Glue - use for tidying print statements based on input variables
+```bash
+sudo apt-get install -y r-base
+sudo Rscript -e 'install.packages("nflfastR", repos="https://cloud.r-project.org")'
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
-### **Twitter: @BearlyAnalytics**
+## Training
+
+```bash
+python src/model.py train --n-estimators 500 --max-depth 8 --learning-rate 0.05
+```
+
+### Arguments
+
+| Argument             | Default | Description                          |
+| -------------------- | ------- | ------------------------------------ |
+| `--n-estimators`     | `100`   | Number of boosting rounds            |
+| `--max-depth`        | `6`     | Maximum tree depth                   |
+| `--learning-rate`    | `0.1`   | Boosting learning rate               |
+| `--subsample`        | `0.8`   | Fraction of training data per tree   |
+| `--colsample-bytree` | `0.8`   | Fraction of features per tree        |
+| `--reg-alpha`        | `0.0`   | L1 regularization                    |
+| `--reg-lambda`       | `1.0`   | L2 regularization                    |
+
+### Training Output
+
+Each training run creates a timestamped folder in `models/` (e.g., `20260130T200000_a1b2c3d4e5`) containing:
+
+- `{hash}-training.log` -- training params, duration, and metrics (RMSE, MAE, R², feature importance)
+
+### Tracked Metrics
+
+- **RMSE** (train and validation) -- root mean squared error per boosting round
+- **MAE** (train and validation) -- mean absolute error per boosting round
+- **R²** -- final coefficient of determination on the validation set
+- **Feature importance** -- per-feature importance scores from the trained model
+
+## Project Structure
+
+```
+data/
+  teams_logos_colors.csv  # Team metadata
+src/
+  model.py                # XGBoost model, training CLI, and metrics tracking
+models/                   # Saved training runs (auto-created per run)
+info/
+  ensemble-analysis.md    # Ensemble approach analysis
+  model-analysis.md       # Model performance analysis
+```
