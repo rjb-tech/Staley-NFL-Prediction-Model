@@ -1,11 +1,10 @@
 from datetime import datetime
 
 import pandas as pd
-import rpy2.robjects as ro
-from rpy2.robjects import pandas2ri
-from rpy2.robjects.conversion import localconverter
 
 from src.timer import Timer
+
+_PBP_URL = "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_{year}.parquet"
 
 
 def load_raw_pbp_data() -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -18,12 +17,17 @@ def load_raw_pbp_data() -> tuple[pd.DataFrame, pd.DataFrame]:
 
     current_year = datetime.now().year
 
-    ro.r("library(nflfastR)")
-    ro.r("options(nflreadr.verbose = FALSE)")
-
     with Timer("PBP loading"):
-        with localconverter(ro.default_converter + pandas2ri.converter):
-            training_data = ro.r(f"nflfastR::load_pbp(seasons={1999}:{current_year-2})")
-            testing_data = ro.r(f"nflfastR::load_pbp(seasons={current_year-1})")
+        # all seasons of pbp data from 1999 - current_year
+        training_data = pd.concat(
+            [
+                pd.read_parquet(_PBP_URL.format(year=y))
+                for y in range(1999, current_year - 1)
+            ],
+            ignore_index=True,
+        )
+
+        # latest season
+        testing_data = pd.read_parquet(_PBP_URL.format(year=current_year - 1))
 
     return training_data, testing_data

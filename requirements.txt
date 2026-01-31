@@ -7,4 +7,4 @@ black
 pycodestyle
 matplotlib
 python-dotenv
-rpy2
+pyarrow
