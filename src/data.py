@@ -12,6 +12,8 @@ def load_training_pbp_data() -> tuple[pd.DataFrame, pd.DataFrame]:
     - training_data: all seasons through last year
     - testing_data: the current year's season
     """
+
+    print("Loading training data, this will take a while...")
     
     current_year = datetime.now().year
     ro.r("library(nflfastR)")
