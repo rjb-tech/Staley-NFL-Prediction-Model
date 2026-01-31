@@ -105,10 +105,16 @@ def main():
         "--learning-rate", type=float, default=0.1, help="Boosting learning rate."
     )
     train_parser.add_argument(
-        "--subsample", type=float, default=0.8, help="Fraction of training data per tree."
+        "--subsample",
+        type=float,
+        default=0.8,
+        help="Fraction of training data per tree.",
     )
     train_parser.add_argument(
-        "--colsample-bytree", type=float, default=0.8, help="Fraction of features per tree."
+        "--colsample-bytree",
+        type=float,
+        default=0.8,
+        help="Fraction of features per tree.",
     )
     train_parser.add_argument(
         "--reg-alpha", type=float, default=0.0, help="L1 regularization."

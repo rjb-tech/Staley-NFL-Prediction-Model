@@ -5,7 +5,7 @@ class Timer:
     def __init__(self, name: str):
         if name is None:
             raise Exception("Timer name required")
-        
+
         self.name = name
 
     def __enter__(self):
